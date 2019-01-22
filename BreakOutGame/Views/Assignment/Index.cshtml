@@ -1,0 +1,68 @@
+﻿@model BreakOutGame.Models.Domain.Assignment
+@{
+    ViewData["Title"] = "Index";
+}
+<div>
+    <div>
+        <div>
+            <div class="opdrachtNaamf">
+                <h2>Opdracht: @Model.Exercise.Name</h2>
+                <h3>Aantal vragen voltooid: @ViewData["qamount"]</h3>
+            </div>
+            @{
+                @await Html.PartialAsync("../Shared/_TempData", "wronganswer")
+                @await Html.PartialAsync("../Shared/_TempData", "blocked")  
+                @await Html.PartialAsync("../Shared/_TempData", "feedback")
+                if (TempData["feedback"] != null)
+                {
+                    <div class="alert alert-info" role="alert">
+                        <a href="pdf/@Model.Exercise.Feedback" target="_blank">Klik hier om de herhaling van de les te zien</a>
+                    </div>
+                }
+            }
+            <div class="row">
+                <div id="pdf">
+                    <div class="col-sm-12 col-sm-9 col-md-8">
+                        <object width="600" height="500" type="application/pdf" data="pdf/@Model.Exercise.PDF?#zoom=60&scrollbar=0&toolbar=0&navpanes=0" id="pdf_content">
+                            <p>Insert your error message here, if the PDF cannot be displayed.</p>
+                        </object>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-sm-3 col-md-6">
+                    <form class="formEx" method="post" asp-action="ValidateAnswer">
+                        <h3>@Model.GroupOperation.AssignmentString</h3>
+                        <label>Antwoord</label>
+                        <input name="answer" type="text">
+                        <button class="btn btn-primary" type="submit">Controleer</button>
+                    </form>
+                </div>
+            </div>
+      
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: @((int)ViewData["percentage"])%;" aria-valuenow="@((int)ViewData["percentage"])" aria-valuemin="0" aria-valuemax="100">@ViewData["percentage"]%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+   @{
+       if (Model.Exercise.Time > 0)
+       {
+           <script>
+               window.onload = function () {
+                   setInterval(
+                       function () {
+
+                           $.ajax({
+                               method: "POST",
+                               url: "/BoBGroup/BlockCurrentGroup"
+                           }).done(function (data) {
+                               window.location.href = '@Url.Action("Index","Assignment")';
+                           });
+                       },@Model.Exercise.Time * 60 * 1000);
+
+               }
+           </script>
+       }
+   }
+ 

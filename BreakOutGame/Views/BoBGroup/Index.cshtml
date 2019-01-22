@@ -1,0 +1,44 @@
+﻿@using BreakOutGame.Models.Domain
+@model IEnumerable<BreakOutGame.Models.Domain.BoBGroup>
+@{
+    ViewData["Title"] = "Index";
+}
+<h2 class="firsth2">Overzicht groepen</h2>
+@{
+    @await Html.PartialAsync("../Shared/_TempData", "groupchosen")
+}
+
+<div class="grouplist">
+    @foreach (var group in Model)
+    {   
+        <div id="@("groupparent" + "_" + group.GroupName.Replace(" ", "_"))" class="col-sm-12 col-sm-6 col-md-6 groupparent">
+            <div class="overlay"></div>
+            <div class="group @(group.Status == GroupStatus.NotSelected ? "groupnotselected" : "groupselected")" id="@(group.GroupName.Replace(" ", "_"))">
+
+                <p class="groupName ">@group.GroupName</p>
+                <hr/>
+                <img alt="De groepsafbeelding" src="/images/group2.png" class="groupimg" />
+                @await Html.PartialAsync("_GroupMembers", group)
+             
+            </div>
+            @if (group.Status == GroupStatus.NotSelected)
+            {
+                <div class="confirmation group sideDiv groupnotselected" hidden id="@((group.GroupName.Replace(" ", "_")) + "hid")">
+                    <p>Ben je zeker dat je <strong>@group.GroupName</strong> wilt kiezen als je actieve groep?
+                    </p>
+                    @await Html.PartialAsync("_GroupMembers", group)
+                    <form method="post" asp-action="WaitScreen" asp-route-id="@group.Id">                
+                        <button type="submit" class="btn btn-primary nonclick" >Selecteer deze groep</button>
+                    </form>
+                    <a class="btn btn-danger">Nee ik ben toch niet zeker</a>
+                </div>
+            }
+        </div>
+
+    }
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript" src="/js/groupoverview.js"></script>
+}
